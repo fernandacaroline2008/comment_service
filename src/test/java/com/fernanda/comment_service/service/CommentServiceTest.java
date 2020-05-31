@@ -6,6 +6,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -27,7 +30,7 @@ class CommentServiceTest {
 
     @Test
     public void create_callsRepository() {
-        Comment comment = new Comment(10L, "My text", LocalDateTime.now());
+        Comment comment = createComment();
 
         when(commentRepository.save(comment)).thenReturn(comment);
 
@@ -35,5 +38,35 @@ class CommentServiceTest {
 
         assertThat(result, is(comment));
         verify(commentRepository, times(1)).save(comment);
+    }
+
+    @Test
+    public void find_whenUserIdIsPresent_callsRepository() {
+        Comment comment1 = createComment();
+        Comment comment2 = createComment();
+        List<Comment> comments = Arrays.asList(comment1, comment2);
+        when(commentRepository.findAll()).thenReturn(comments);
+
+        List<Comment> result = commentService.find(Optional.empty());
+
+        assertThat(result, is(comments));
+        verify(commentRepository, times(1)).findAll();
+    }
+
+    @Test
+    public void find_whenUserIdIsEmpty_callsRepository() {
+        Comment comment1 = createComment();
+        Comment comment2 = createComment();
+        List<Comment> comments = Arrays.asList(comment1, comment2);
+        when(commentRepository.findByUserId(1L)).thenReturn(comments);
+
+        List<Comment> result = commentService.find(Optional.of(1L));
+
+        assertThat(result, is(comments));
+        verify(commentRepository, times(1)).findByUserId(1L);
+    }
+
+    private Comment createComment() {
+        return new Comment(1L, "My text", 1L, LocalDateTime.now());
     }
 }

@@ -18,15 +18,21 @@ public class Comment extends BaseEntity {
     @Column(nullable = false)
     private String text;
 
-    public Comment(String text) {
-        super();
-        this.text = text;
+    private Long userId;
+
+    public Comment() {
     }
 
-    public Comment(Long id, String text, LocalDateTime created) {
+    public Comment(String text, Long userId) {
+        this.text = text;
+        this.userId = userId;
+    }
+
+    public Comment(Long id, String text, Long userId, LocalDateTime created) {
         super(created);
         this.id = id;
         this.text = text;
+        this.userId = userId;
     }
 
     public Long getId() {
@@ -35,5 +41,9 @@ public class Comment extends BaseEntity {
 
     public String getText() {
         return text;
+    }
+
+    public Long getUserId() {
+        return userId;
     }
 }

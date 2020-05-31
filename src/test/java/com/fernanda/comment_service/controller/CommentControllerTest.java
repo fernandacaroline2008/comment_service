@@ -1,5 +1,6 @@
 package com.fernanda.comment_service.controller;
 
+import com.fernanda.comment_service.domain.Comment;
 import com.fernanda.comment_service.dto.CommentCreateDto;
 import com.fernanda.comment_service.service.CommentService;
 import com.google.gson.Gson;
@@ -11,8 +12,16 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
+import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(CommentController.class)
@@ -29,7 +38,7 @@ class CommentControllerTest {
 
     @Test
     public void create_whenCommentIsValid_returnSuccess() throws Exception {
-        CommentCreateDto commentCreateDto = new CommentCreateDto("My first post");
+        CommentCreateDto commentCreateDto = new CommentCreateDto("My first post", 1l);
         String body = gson.toJson(commentCreateDto);
         mockMvc.perform(post(COMMENT_URI).contentType(MediaType.APPLICATION_JSON).content(body))
                .andExpect(status().isCreated())
@@ -37,8 +46,43 @@ class CommentControllerTest {
     }
 
     @Test
-    public void create_whenCommentIsNotValid_returnError() throws Exception {
-        mockMvc.perform(post(COMMENT_URI))
+    public void create_whenTextIsEmpty_returnError() throws Exception {
+        CommentCreateDto commentCreateDto = new CommentCreateDto("", 1l);
+        String body = gson.toJson(commentCreateDto);
+        mockMvc.perform(post(COMMENT_URI).contentType(MediaType.APPLICATION_JSON).content(body))
                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void create_whenUserIdIsNull_returnError() throws Exception {
+        CommentCreateDto commentCreateDto = new CommentCreateDto("My first post", null);
+        String body = gson.toJson(commentCreateDto);
+        mockMvc.perform(post(COMMENT_URI).contentType(MediaType.APPLICATION_JSON).content(body))
+               .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void find_withUserId_returnSuccess() throws Exception {
+        Comment comment1 = new Comment("Comment 1", 1l);
+        Comment comment2 = new Comment("Comment 2", 1l);
+        List<Comment> comments = Arrays.asList(comment1, comment2);
+        when(commentService.find(Optional.of(1L))).thenReturn(comments);
+
+        mockMvc.perform(get(COMMENT_URI + "?userId=1"))
+               .andExpect(status().isOk())
+               .andExpect(jsonPath("$", hasSize(2)));
+    }
+
+    @Test
+    public void find_withoutUserId_returnSuccess() throws Exception {
+        Comment comment1 = new Comment("Comment 1", 1l);
+        Comment comment2 = new Comment("Comment 2", 1l);
+        Comment comment3 = new Comment("Comment 3", 2l);
+        List<Comment> comments = Arrays.asList(comment1, comment2, comment3);
+        when(commentService.find(Optional.empty())).thenReturn(comments);
+
+        mockMvc.perform(get(COMMENT_URI))
+               .andExpect(status().isOk())
+               .andExpect(jsonPath("$", hasSize(3)));
     }
 }
