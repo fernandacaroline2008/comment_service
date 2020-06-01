@@ -19,6 +19,11 @@ public class User extends BaseEntity {
     public User() {
     }
 
+    public User(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
     public User(String name) {
         this.name = name;
     }

@@ -39,7 +39,7 @@ class CommentControllerTest {
 
     @Test
     public void create_whenCommentIsValid_returnSuccess() throws Exception {
-        CommentCreateDto commentCreateDto = new CommentCreateDto("My first post", 1l);
+        CommentCreateDto commentCreateDto = new CommentCreateDto("My first post", 1l, "Toronto", 43.651070, -79.347015, 20.0);
         String body = gson.toJson(commentCreateDto);
         mockMvc.perform(post(COMMENT_URI).contentType(MediaType.APPLICATION_JSON).content(body))
                .andExpect(status().isCreated())

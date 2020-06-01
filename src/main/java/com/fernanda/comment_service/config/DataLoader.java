@@ -15,13 +15,13 @@ public class DataLoader {
     @Bean
     public CommandLineRunner loadData(UserRepository userRepository, CommentRepository commentRepository) {
         return args -> {
-            User user = new User("Fernanda");
+            User user = new User(1l, "Fernanda");
             userRepository.save(user);
 
-            User user2 = new User("Ane");
+            User user2 = new User(2l, "Ane");
             userRepository.save(user2);
 
-            Comment comment = new Comment("My first comment!", user);
+            Comment comment = new Comment("My first comment!", user, "Toronto", 43.651070, -79.347015, 20.0);
             commentRepository.save(comment);
 
             Comment reply1Comment1 = new Comment("My reply 1 to comment 1!", user, Optional.of(comment));
@@ -33,7 +33,7 @@ public class DataLoader {
             Comment replyReply1Comment1 = new Comment("One more!", user, Optional.of(reply1Comment1));
             commentRepository.save(replyReply1Comment1);
 
-            Comment comment2 = new Comment("My first comment!", user2);
+            Comment comment2 = new Comment("My first comment!", user2, "Vancouver", 43.651070, -79.347015, 25.0);
             commentRepository.save(comment2);
         };
     }

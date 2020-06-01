@@ -36,6 +36,15 @@ public class Comment extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @Column(nullable = true)
+    private String city;
+    @Column(nullable = true)
+    private Double latitude;
+    @Column(nullable = true)
+    private Double longitude;
+    @Column(nullable = true)
+    private Double temperature;
+
     public Comment() {
     }
 
@@ -52,7 +61,6 @@ public class Comment extends BaseEntity {
         this.parent = null;
     }
 
-
     public Comment(String text, User user, Optional<Comment> parent) {
         this.text = text;
         this.user = user;
@@ -65,6 +73,15 @@ public class Comment extends BaseEntity {
         this.text = text;
         this.user = user;
         this.parent = parent.orElse(null);
+    }
+
+    public Comment(String text, User user, String city, Double latitude, Double longitude, Double temperature) {
+        this.text = text;
+        this.user = user;
+        this.city = city;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.temperature = temperature;
     }
 
     public Long getId() {
@@ -81,6 +98,22 @@ public class Comment extends BaseEntity {
 
     public List<Comment> getReplies() {
         return replies;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public Double getTemperature() {
+        return temperature;
     }
 
     public void setParent(Comment parent) {
