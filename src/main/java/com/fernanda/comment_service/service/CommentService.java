@@ -19,6 +19,10 @@ public class CommentService {
         return commentRepository.save(comment);
     }
 
+    public Optional<Comment> findById(Long commentId) {
+        return commentRepository.findById(commentId);
+    }
+
     public List<Comment> find(Optional<Long> userId) {
         return userId.map(commentRepository::findByUserId).orElse(commentRepository.findAll());
     }

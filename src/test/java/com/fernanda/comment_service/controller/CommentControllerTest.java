@@ -1,6 +1,7 @@
 package com.fernanda.comment_service.controller;
 
 import com.fernanda.comment_service.domain.Comment;
+import com.fernanda.comment_service.domain.User;
 import com.fernanda.comment_service.dto.CommentCreateDto;
 import com.fernanda.comment_service.service.CommentService;
 import com.google.gson.Gson;
@@ -62,27 +63,53 @@ class CommentControllerTest {
     }
 
     @Test
+    public void reply_whenCommentIsValid_returnSuccess() throws Exception {
+        User user = new User(1l);
+        Comment parent = new Comment(1l, "My first post", user);
+        when(commentService.findById(parent.getId())).thenReturn(Optional.of(parent));
+
+        CommentCreateDto commentCreateDto = new CommentCreateDto("My reply", 1l);
+        String body = gson.toJson(commentCreateDto);
+        mockMvc.perform(post(COMMENT_URI + "/1/reply").contentType(MediaType.APPLICATION_JSON).content(body))
+               .andExpect(status().isCreated())
+               .andExpect(content().string(CoreMatchers.containsString(commentCreateDto.text)));
+    }
+
+    @Test
+    public void reply_whenParentIsNotValid_returnError() throws Exception {
+        when(commentService.findById(1l)).thenReturn(Optional.empty());
+
+        CommentCreateDto commentCreateDto = new CommentCreateDto("My reply", 1l);
+        String body = gson.toJson(commentCreateDto);
+        mockMvc.perform(post(COMMENT_URI + "/1/reply").contentType(MediaType.APPLICATION_JSON).content(body))
+               .andExpect(status().isBadRequest());
+    }
+
+    @Test
     public void find_withUserId_returnSuccess() throws Exception {
-        Comment comment1 = new Comment("Comment 1", 1l);
-        Comment comment2 = new Comment("Comment 2", 1l);
+        User user = new User(1l);
+        Comment comment1 = new Comment("Comment 1", user);
+        Comment comment2 = new Comment("Comment 2", user);
         List<Comment> comments = Arrays.asList(comment1, comment2);
         when(commentService.find(Optional.of(1L))).thenReturn(comments);
 
         mockMvc.perform(get(COMMENT_URI + "?userId=1"))
                .andExpect(status().isOk())
-               .andExpect(jsonPath("$", hasSize(2)));
+               .andExpect(jsonPath("$.comments", hasSize(2)));
     }
 
     @Test
     public void find_withoutUserId_returnSuccess() throws Exception {
-        Comment comment1 = new Comment("Comment 1", 1l);
-        Comment comment2 = new Comment("Comment 2", 1l);
-        Comment comment3 = new Comment("Comment 3", 2l);
+        User user1 = new User(1l);
+        User user2 = new User(2l);
+        Comment comment1 = new Comment("Comment 1", user1);
+        Comment comment2 = new Comment("Comment 2", user1);
+        Comment comment3 = new Comment("Comment 3", user2);
         List<Comment> comments = Arrays.asList(comment1, comment2, comment3);
         when(commentService.find(Optional.empty())).thenReturn(comments);
 
         mockMvc.perform(get(COMMENT_URI))
                .andExpect(status().isOk())
-               .andExpect(jsonPath("$", hasSize(3)));
+               .andExpect(jsonPath("$.comments", hasSize(3)));
     }
 }

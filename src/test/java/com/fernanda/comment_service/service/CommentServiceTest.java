@@ -1,6 +1,7 @@
 package com.fernanda.comment_service.service;
 
 import com.fernanda.comment_service.domain.Comment;
+import com.fernanda.comment_service.domain.User;
 import com.fernanda.comment_service.repository.CommentRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -67,6 +68,7 @@ class CommentServiceTest {
     }
 
     private Comment createComment() {
-        return new Comment(1L, "My text", 1L, LocalDateTime.now());
+        User user = new User(1L);
+        return new Comment(1L, "My text", user, Optional.empty(), LocalDateTime.now());
     }
 }

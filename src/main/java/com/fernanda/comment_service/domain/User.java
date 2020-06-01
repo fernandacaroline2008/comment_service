@@ -16,8 +16,15 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private String name;
 
+    public User() {
+    }
+
     public User(String name) {
         this.name = name;
+    }
+
+    public User(Long id) {
+        this.id = id;
     }
 
     public Long getId() {

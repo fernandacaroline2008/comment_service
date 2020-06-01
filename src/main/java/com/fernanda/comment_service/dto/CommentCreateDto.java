@@ -1,6 +1,7 @@
 package com.fernanda.comment_service.dto;
 
 import com.fernanda.comment_service.domain.Comment;
+import com.fernanda.comment_service.domain.User;
 
 public class CommentCreateDto {
     public String text;
@@ -15,7 +16,7 @@ public class CommentCreateDto {
     }
 
     public Comment toDomain() {
-        return new Comment(text, userId);
+        return new Comment(text, new User(userId));
     }
 
 }
