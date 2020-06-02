@@ -2,6 +2,7 @@ package com.fernanda.comment_service.controller;
 
 import com.fernanda.comment_service.domain.Comment;
 import com.fernanda.comment_service.dto.CommentCreateDto;
+import com.fernanda.comment_service.dto.CommentDto;
 import com.fernanda.comment_service.dto.CommentListDto;
 import com.fernanda.comment_service.service.CommentService;
 import org.slf4j.Logger;
@@ -33,7 +34,7 @@ public class CommentController {
     }
 
     @PostMapping()
-    public ResponseEntity<Comment> create(@RequestBody CommentCreateDto commentCreateDto) {
+    public ResponseEntity<CommentDto> create(@RequestBody CommentCreateDto commentCreateDto) {
         if (commentCreateDto.text.isEmpty()) {
             LOG.error("Error creating comment: text is required.");
             return new ResponseEntity("Text is required", new HttpHeaders(), HttpStatus.BAD_REQUEST);
@@ -47,12 +48,12 @@ public class CommentController {
         Comment comment = commentCreateDto.toDomain();
         commentService.create(comment);
 
-        return new ResponseEntity(comment, HttpStatus.CREATED);
+        return new ResponseEntity(CommentDto.fromDomain(comment), HttpStatus.CREATED);
     }
 
     @PostMapping("/{commentId}/reply")
-    public ResponseEntity<Comment> reply(@PathVariable(value = "commentId") Long commentId,
-                                         @RequestBody CommentCreateDto commentCreateDto) {
+    public ResponseEntity<CommentDto> reply(@PathVariable(value = "commentId") Long commentId,
+                                            @RequestBody CommentCreateDto commentCreateDto) {
         if (commentCreateDto.text.isEmpty()) {
             LOG.error("Error creating comment: text is required.");
             return new ResponseEntity("Text is required", new HttpHeaders(), HttpStatus.BAD_REQUEST);
@@ -73,13 +74,13 @@ public class CommentController {
         comment.setParent(parent.get());
         commentService.create(comment);
 
-        return new ResponseEntity(comment, HttpStatus.CREATED);
+        return new ResponseEntity(CommentDto.fromDomain(comment), HttpStatus.CREATED);
     }
 
     @GetMapping()
     public ResponseEntity<CommentListDto> find(@RequestParam(value = "userId", required = false) Optional<Long> userId) {
         List<Comment> comments = commentService.find(userId);
-        CommentListDto commentsDto = new CommentListDto(comments);
+        CommentListDto commentsDto = CommentListDto.fromDomain(comments);
         return new ResponseEntity(commentsDto, HttpStatus.OK);
     }
 }
