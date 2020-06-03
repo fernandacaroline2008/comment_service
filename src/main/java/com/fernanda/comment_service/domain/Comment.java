@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Entity
-@Table(name = "comment")
+@Table(name = "comments")
 public class Comment extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
